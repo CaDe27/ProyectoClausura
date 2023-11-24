@@ -1,0 +1,6 @@
+shakespeare_the_merchant_of_venice
+shakespeare_romeo_juliet
+shakespeare_hamlet
+dickens_a_christmas_carol
+dickens_oliver_twist
+dickens_a_tale_of_two_cities

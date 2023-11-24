@@ -1,0 +1,1 @@
+./serial $(python print_book_titles.py < titles.txt)
