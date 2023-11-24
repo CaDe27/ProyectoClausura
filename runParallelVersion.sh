@@ -1,0 +1,1 @@
+mpiexec -n 6 ./parallelGather $(python print_book_titles.py < titles.txt)
