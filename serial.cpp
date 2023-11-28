@@ -11,11 +11,6 @@ using namespace std;
 void loadVocabulary(map<string, int> &frequencies){
     ifstream file("vocabulary.csv");
 
-    if (!file.is_open()) {
-        cerr << "Error opening file" << endl;
-        return;
-    }
-
     // the file contains only one line, with all the words
     // separated by commas. We read them into the vocabulary_csv string
     string vocabulary_csv;
@@ -27,8 +22,6 @@ void loadVocabulary(map<string, int> &frequencies){
 
     // this reads the line until the next comma
     while (getline(ss, word, ',')) {
-        // we first eliminate the first space
-        word = word.substr(1, word.size());
         // we add the word to a dictionary
         frequencies.insert(make_pair(word, 0));
     }
@@ -51,7 +44,7 @@ ofstream createOutputStream(){
 void saveVocabularyToFile(map<string, int> &frequencies, ofstream &outputFile){
     outputFile<<"book";
     for(auto word_frequency : frequencies){
-        outputFile<<", "<<word_frequency.first;
+        outputFile<<","<<word_frequency.first;
     }
     outputFile<<"\n";
 }
@@ -75,9 +68,8 @@ void getBookFrequencies(const string &bookName, map<string, int> &frequencies){
 
     // this reads the line until the next comma
     while (getline(ss, word, ',')) {
-        // we first eliminate the first space
-        word = word.substr(1, word.size());
         // we augment the frequency of the word if it's in the vocabulary
+        int a = word.size();
         auto it = frequencies.find(word);
         if(it != frequencies.end()){
             ++it->second;
@@ -88,10 +80,10 @@ void getBookFrequencies(const string &bookName, map<string, int> &frequencies){
     file.close();
 }
 
-void saveFrequenciesToOutputFile(ofstream &outputFile, const string &bookTitle, const map<string, int> &frequencies){
+void saveFrequenciesToOutputFile(ofstream &outputFile, const string &bookTitle, const map<string, int> &frequencies, int bookId){
     outputFile<<bookTitle;
     for(auto word_frequency : frequencies){
-        outputFile<<", "<<word_frequency.second;
+        outputFile<<","<<word_frequency.second;
     }
     outputFile<<"\n";
 }
@@ -112,13 +104,13 @@ int main(int argc, char* argv[]) {
     // frequencies is a map that will store the vocabulary and
     // the frequency for each word
     // we will use it for each book. 
-    auto start = chrono::high_resolution_clock::now();
+
     map<string, int> frequencies;
     loadVocabulary(frequencies);
-
     ofstream frequenciesFile = createOutputStream();
     saveVocabularyToFile(frequencies, frequenciesFile);
     
+    auto start = chrono::high_resolution_clock::now();
     string bookTitle;
     // for each book, iterate over it to get the vocabulary
     // frequencies and store it in the file
@@ -126,10 +118,11 @@ int main(int argc, char* argv[]) {
         setFrequenciesToZero(frequencies);
         bookTitle = string(argv[i]);
         getBookFrequencies(bookTitle + ".txt", frequencies);
-        saveFrequenciesToOutputFile(frequenciesFile, bookTitle, frequencies);
+        saveFrequenciesToOutputFile(frequenciesFile, bookTitle, frequencies, i-1);
     }
     auto end = chrono::high_resolution_clock::now();
     chrono::duration<double> elapsed = end - start;
     cout <<"serial: "<<fixed<<setprecision(7)<<elapsed.count()<< endl;
+    
     return 0;
 }
